@@ -21,36 +21,31 @@ public class MainWindow extends JFrame {
     private CharacterManager manager;
     private JPanel listPanel;
 
-    // Label pada panel tambahan (GridLayout 2x2 di NORTH)
     private JLabel statTotalLabel;
     private JLabel statAvgLevelLabel;
     private JLabel statVeteranLabel;
     private JLabel statAliveLabel;
-
-    // Label pada bar status (SOUTH)
     private JLabel statusLeftLabel;
 
     public MainWindow(CharacterManager manager) {
         this.manager = manager;
         initComponents();
-        refreshData();
+        refreshList();
         pack();
         setLocationRelativeTo(null);
     }
 
     private void initComponents() {
-        setTitle("Character Manager v0.5 — TP12 Layout Responsif (Java Visual SIH-6406)");
+        setTitle("Character Manager v0.6 — TP14 Form Input & Validasi (Java Visual SIH-6406)");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout(0, 0));
         getContentPane().setBackground(AppTheme.BG_WINDOW);
 
-        // =========================================================================
-        // 1. WILAYAH NORTH: Header Judul + Panel Tambahan Statistik (GridLayout 2x2)
-        // =========================================================================
+        // 1. NORTH: Header + Form Input + Statistik Grid 2x2
         JPanel northContainer = new JPanel(new BorderLayout());
         northContainer.setBackground(AppTheme.BG_WINDOW);
 
-        JLabel headerLabel = new JLabel("DAFTAR KARAKTER GAME (v0.5 RESPONSIVE LAYOUT)", SwingConstants.CENTER);
+        JLabel headerLabel = new JLabel("CHARACTER MANAGER v0.6 — FORM & VALIDASI DUA LAPIS", SwingConstants.CENTER);
         headerLabel.setFont(AppTheme.FONT_HEADER);
         headerLabel.setForeground(AppTheme.TEXT_GOLD);
         headerLabel.setBackground(AppTheme.BG_WINDOW);
@@ -58,11 +53,18 @@ public class MainWindow extends JFrame {
         headerLabel.setBorder(AppTheme.SECTION_PADDING);
         northContainer.add(headerLabel, BorderLayout.NORTH);
 
-        // Panel Tambahan (Bagian B.3): Ringkasan Statistik 2x2 menggunakan GridLayout
+        CharacterFormPanel formPanel = new CharacterFormPanel(manager, new Runnable() {
+            @Override
+            public void run() {
+                refreshList();
+            }
+        });
+        northContainer.add(formPanel, BorderLayout.CENTER);
+
         JPanel statsGridPanel = new JPanel(new GridLayout(2, 2, 10, 6));
         statsGridPanel.setBackground(AppTheme.BG_PANEL);
         statsGridPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createMatteBorder(1, 0, 1, 0, AppTheme.ROLE_DEFAULT),
+            BorderFactory.createMatteBorder(0, 0, 1, 0, AppTheme.ROLE_DEFAULT),
             BorderFactory.createEmptyBorder(8, 16, 8, 16)
         ));
 
@@ -79,28 +81,23 @@ public class MainWindow extends JFrame {
         northContainer.add(statsGridPanel, BorderLayout.SOUTH);
         add(northContainer, BorderLayout.NORTH);
 
-        // =========================================================================
-        // 2. WILAYAH CENTER: Daftar Karakter Berscroll dengan Wrapper BorderLayout.NORTH
-        // =========================================================================
+        // 2. CENTER: Daftar Karakter Berscroll
         listPanel = new JPanel();
         listPanel.setLayout(new GridLayout(0, 1, 8, 8));
         listPanel.setBackground(AppTheme.BG_PANEL);
 
-        // Panel pembungkus agar kartu tidak melar vertikal saat jendela diperbesar (Bagian D.3)
         JPanel listWrapper = new JPanel(new BorderLayout());
         listWrapper.setBackground(AppTheme.BG_PANEL);
         listWrapper.setBorder(AppTheme.SECTION_PADDING);
         listWrapper.add(listPanel, BorderLayout.NORTH);
 
         JScrollPane scrollPane = new JScrollPane(listWrapper);
-        scrollPane.setPreferredSize(new Dimension(560, 320));
+        scrollPane.setPreferredSize(new Dimension(620, 300));
         scrollPane.setBorder(null);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         add(scrollPane, BorderLayout.CENTER);
 
-        // =========================================================================
-        // 3. WILAYAH EAST: Legenda Role (BoxLayout Y_AXIS + Strut + Glue)
-        // =========================================================================
+        // 3. EAST: Legenda Role
         JPanel legendPanel = new JPanel();
         legendPanel.setLayout(new BoxLayout(legendPanel, BoxLayout.Y_AXIS));
         legendPanel.setBackground(AppTheme.BG_WINDOW);
@@ -116,7 +113,6 @@ public class MainWindow extends JFrame {
         legendPanel.add(legendTitle);
         legendPanel.add(Box.createVerticalStrut(10));
 
-        // Legenda diturunkan dinamis dari CharacterType.values() (Bagian A.3)
         for (CharacterType type : CharacterType.values()) {
             JLabel roleBadge = new JLabel("  " + type.name() + "  ");
             roleBadge.setOpaque(true);
@@ -124,27 +120,31 @@ public class MainWindow extends JFrame {
             roleBadge.setForeground(AppTheme.TEXT_PRIMARY);
             roleBadge.setFont(AppTheme.FONT_CARD_REGULAR);
             roleBadge.setBorder(AppTheme.borderFor(type));
-            roleBadge.setMaximumSize(new Dimension(150, 32));
+            roleBadge.setMaximumSize(new Dimension(160, 32));
             roleBadge.setAlignmentX(Component.LEFT_ALIGNMENT);
 
             legendPanel.add(roleBadge);
             legendPanel.add(Box.createVerticalStrut(8));
         }
 
-        // Glue mendorong sisa ruang kosong ke bagian bawah legenda
         legendPanel.add(Box.createVerticalGlue());
 
-        JLabel veteranNote = new JLabel("★ Teks Emas = Lv ≥ " + AppTheme.VETERAN_LEVEL_THRESHOLD);
+        JLabel veteranNote = new JLabel("★ Emas = Lv ≥ " + AppTheme.VETERAN_LEVEL_THRESHOLD);
         veteranNote.setFont(AppTheme.FONT_CARD_REGULAR);
         veteranNote.setForeground(AppTheme.TEXT_GOLD);
         veteranNote.setAlignmentX(Component.LEFT_ALIGNMENT);
         legendPanel.add(veteranNote);
 
+        JLabel mageRuleNote = new JLabel("• MAGE Maks Lv 60");
+        mageRuleNote.setFont(AppTheme.FONT_CARD_REGULAR);
+        mageRuleNote.setForeground(AppTheme.TEXT_MUTED);
+        mageRuleNote.setAlignmentX(Component.LEFT_ALIGNMENT);
+        legendPanel.add(Box.createVerticalStrut(4));
+        legendPanel.add(mageRuleNote);
+
         add(legendPanel, BorderLayout.EAST);
 
-        // =========================================================================
-        // 4. WILAYAH SOUTH: Bar Status (Teks di Kiri & "v0.5" di Kanan — Mini-Challenge)
-        // =========================================================================
+        // 4. SOUTH: Bar Status v0.6
         JPanel statusBar = new JPanel(new BorderLayout());
         statusBar.setBackground(AppTheme.BG_WINDOW);
         statusBar.setBorder(BorderFactory.createCompoundBorder(
@@ -156,7 +156,7 @@ public class MainWindow extends JFrame {
         statusLeftLabel.setFont(AppTheme.FONT_CARD_REGULAR);
         statusLeftLabel.setForeground(AppTheme.TEXT_MUTED);
 
-        JLabel versionRightLabel = new JLabel("v0.5", SwingConstants.RIGHT);
+        JLabel versionRightLabel = new JLabel("v0.6", SwingConstants.RIGHT);
         versionRightLabel.setFont(AppTheme.FONT_FOOTER);
         versionRightLabel.setForeground(AppTheme.TEXT_GOLD);
 
@@ -173,7 +173,7 @@ public class MainWindow extends JFrame {
         return label;
     }
 
-    public void refreshData() {
+    public void refreshList() {
         listPanel.removeAll();
 
         ArrayList<Character> characters = manager.getAllCharacters();
@@ -230,13 +230,10 @@ public class MainWindow extends JFrame {
             listPanel.add(itemLabel);
         }
 
-        // Update Panel Statistik 2x2 (NORTH)
-        statTotalLabel.setText("Total Karakter: " + manager.getTotalCharacters());
+        statTotalLabel.setText("Total Karakter: " + manager.getTotalCharacters() + "/" + CharacterManager.MAX_ROSTER_CAPACITY);
         statAvgLevelLabel.setText(String.format("Rata-rata Level: %.2f", manager.getAverageLevel()));
         statVeteranLabel.setText("Veteran (Lv ≥ " + AppTheme.VETERAN_LEVEL_THRESHOLD + "): " + veteranCount);
         statAliveLabel.setText("Status Siap Tempur: " + aliveCount + "/" + manager.getTotalCharacters());
-
-        // Update Bar Status Kiri (SOUTH)
         statusLeftLabel.setText("Status: Aktif • Menampilkan " + characters.size() + " karakter");
 
         listPanel.revalidate();
