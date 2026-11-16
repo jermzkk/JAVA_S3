@@ -1,51 +1,40 @@
 # Character Manager — Java Visual (SIH-6406)
 
-Aplikasi berbasis Java untuk mengelola model data karakter game (`Character`, `CharacterType`), koleksi & validasi bisnis (`CharacterManager`), hingga antarmuka grafis desktop bertema berbasis Java Swing (`MainWindow` & `AppTheme`).
+Aplikasi berbasis Java untuk mengelola model data karakter game (`Character`, `CharacterType`), koleksi & validasi bisnis (`CharacterManager`), hingga antarmuka grafis desktop bertema dan responsif berbasis Java Swing (`MainWindow` & `AppTheme`).
 
 ---
 
-## TP10 — Character Manager Sprint #4 (Theming, Properti Komponen & Analisis MVC)
+## TP12 — Character Manager Sprint #5 (Layout, UI Responsif & Analisis MVC)
 
-### 1. Perbandingan Tampilan GUI (Sebelum v0.3 vs Sesudah v0.4)
-**Sebelum Penerapan Tema (v0.3 — Tampilan Standar):**
-![MainWindow v0.3 Sebelum Tema](SS/HS3_sebelum.png)
-
-**Sesudah Penerapan Tema (v0.4 — Dark Theme, Warna per Role & Veteran Highlight):**
-![MainWindow v0.4 Sesudah Tema](SS/HS4_v04.png)
-
-### 2. Alasan Pemisahan Warna di `AppTheme` (View) Bukan di `Character` (Model)
-Berdasarkan prinsip *Separation of Concerns* dalam arsitektur **Model–View–Controller (MVC)**, `Character` berada pada lapisan **Model** yang hanya bertugas menyimpan data domain permainan (nama, *role*, level, HP, ATK, mana) tanpa ketergantungan pada pustaka antarmuka grafis (`java.awt.Color`). Pemetaan *role* ke warna ditempatkan di `AppTheme` pada package `view` agar tampilan visual terpusat di satu tempat dan mudah diubah kapan saja tanpa menyentuh logika bisnis. Dengan pemisahan ini, lapisan `model` tetap bersih, mudah diuji secara mandiri, dan dapat digunakan ulang di platform non-Swing.
-
-### 3. Dua Properti Tambahan Pilihan & Alasannya
-* **`itemLabel.setToolTipText(...)` (Tooltip Interaktif Detail Karakter):** Menampilkan ringkasan lengkap status karakter (nama, *role*, level, HP, ATK, mana, dan status tempur) saat pengguna mengarahkan kursor ke kartu karakter, sehingga informasi tambahan tersedia tanpa membuat teks kartu utama terlihat penuh.
-* **`itemLabel.setBorder(AppTheme.borderFor(c.getType()))` (Border Aksen Samping per Role):** Menambahkan garis aksen warna cerah selebar 5 piksel di sisi kiri setiap kartu sesuai *role* karakter untuk memperjelas pemisahan antarbaris kartu dan meningkatkan kontras visual pada tema gelap.
-
-### 4. Dokumen Analisis Properti & MVC (Bagian D — TP10)
-* **Google Docs Bagian D (TP10):** [JavaVisual_TP10_253303621247_Yeremia_Kembaren](https://docs.google.com/document/d/1_K0CZXq6s3aV8OXRM-NL97nJEqjQyhTWubjqwPLSNjs/edit?usp=sharing)
-
----
-
-
-## Struktur Folder Project
+### 1. Wireframe Tata Letak `MainWindow` v0.5
 ```text
-JAVA_S3/
-├── README.md
-├── SS/
-│   ├── HS1.png
-│   ├── HS2.png
-│   ├── HS3_sebelum.png
-│   ├── HS3_sesudah.png
-│   └── HS4_v04.png
-└── CharacterManager/
-    └── src/
-        └── com/
-            └── unpri/
-                └── charactermanager/
-                    ├── Main.java
-                    ├── model/
-                    │   ├── Character.java
-                    │   ├── CharacterManager.java
-                    │   └── CharacterType.java
-                    └── view/
-                        ├── AppTheme.java
-                        └── MainWindow.java
++-----------------------------------------------------------------------+
+| [NORTH] Header Judul: DAFTAR KARAKTER GAME (v0.5 RESPONSIVE LAYOUT)   |
+| +---------------------------------+---------------------------------+ |
+| | Total Karakter: 8               | Rata-rata Level: 4.50           | |
+| | Veteran (Lv >= 5): 4            | Status Siap Tempur: 8/8         | |
+| +---------------------------------+---------------------------------+ |
++---------------------------------------------------+-------------------+
+| [CENTER] JScrollPane -> listWrapper (NORTH)       | [EAST] BoxLayout  |
+|  +---------------------------------------------+  |  LEGENDA ROLE     |
+|  | 1. Arthur [WARRIOR] — Lv: 4 | HP: 200 ...   |  |  [ WARRIOR ]      |
+|  +---------------------------------------------+  |  [ MAGE    ]      |
+|  | 2. Merlin [MAGE] [VETERAN] — Lv: 6 ...      |  |  [ ARCHER  ]      |
+|  +---------------------------------------------+  |  [ ROGUE   ]      |
+|  | ... (8 kartu karakter dinamis) ...          |  |  (Vertical Glue)  |
+|  +---------------------------------------------+  |  ★ Teks Emas >= 5 |
++---------------------------------------------------+-------------------+
+| [SOUTH] Status: Aktif • Menampilkan 8 karakter                 v0.5   |
++-----------------------------------------------------------------------+
+
+## TP12 - Sprint #5
+
+### Screenshot Perubahan Tampilan (v0.5)
+- **Ukuran Awal (v0.5):**
+  ![Ukuran Awal (v0.5)](SS/HS5_awal.png)
+- **Ukuran Kecil / Scrollbar (v0.5):**
+  ![Ukuran Kecil (v0.5)](SS/HS5_kecil.png)
+- **Ukuran Besar / Maximized (v0.5):**
+  ![Ukuran Besar (v0.5)](SS/HS5_lebar.png)
+
+Link Docs (https://docs.google.com/document/d/15HvEVzajQb468gRHYHkApt0WD-XNsZ7FdPljQm9czhg/edit?usp=sharing)
